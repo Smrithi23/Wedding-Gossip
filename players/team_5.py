@@ -85,7 +85,7 @@ class Player():
 
         try:
             latest_policy = max(
-                glob.glob(f"{CHECKPOINT_PATH}{ENV_NAME}*.zip"), key=os.path.getctime
+                glob.glob("RLEnvironment/wedding_gossip_environment_v2_20231203-185406.zip"), key=os.path.getctime
             )
         except ValueError:
             print("Policy not found.")
@@ -141,7 +141,7 @@ class Player():
                 self.feedbacks
         )
         action, switch, pref = self.model.predict(observation)[0]
-        print(f"Player {self.id}: current gossip {curr_goss}, action space {action, switch, pref}")
+        # print(f"Player {self.id}: current gossip {curr_goss}, action space {action, switch, pref}")
 
         if switch and self.gossip_i < len(self.gossip_list) - 1:
             self.gossip_i += 1
