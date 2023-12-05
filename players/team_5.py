@@ -18,8 +18,8 @@ from pettingzoo.utils import parallel_to_aec
 
 from RLEnvironment.wedding_gossip_env import wedding_gossip_environment_v1
 
-CHECKPOINT_PATH="RLEnvironment/"
-ENV_NAME="wedding_gossip_environment_v2"
+CHECKPOINT_PATH="RLEnvironment/session_19e04d79/"
+ENV_NAME="wedding_"
 
 class Player():
     def __init__(self, id, team_num, table_num, seat_num, unique_gossip, color, turns):
@@ -138,7 +138,8 @@ class Player():
         observation = np.array(
                 [self.seat_id, curr_goss] +
                 self.seats + 
-                self.feedbacks
+                self.feedbacks +
+                [self.time_stamp]
         )
         action, switch, pref = self.model.predict(observation)[0]
         # print(f"Player {self.id}: current gossip {curr_goss}, action space {action, switch, pref}")

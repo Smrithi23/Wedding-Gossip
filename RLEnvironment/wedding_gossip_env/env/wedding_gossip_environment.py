@@ -172,6 +172,7 @@ class WeddingGossipEnvironment(ParallelEnv):
                     while i < len(self.agent_gossips[aid]) and self.agent_gossips[aid][i] > heard_gossip:
                         i += 1
                     self.agent_gossips[aid].insert(i, heard_gossip)
+                    self.curr_gossips[aid] = 0
                 for g, i in possible_gossips:
                     feedback[i].append((g == heard_gossip))
                 rewards[agent] += (heard_gossip + 1) * ALPHA

@@ -3,6 +3,8 @@ from __future__ import annotations
 import glob
 import os
 import time
+import uuid
+from pathlib import Path
 
 from os.path import exists
 from pathlib import Path
@@ -10,6 +12,7 @@ import uuid
 import supersuit as ss
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
+from stable_baselines3.common.callbacks import CheckpointCallback
 from pettingzoo.utils import parallel_to_aec
 from stable_baselines3.common.callbacks import CheckpointCallback
 from wedding_gossip_env import wedding_gossip_environment_v2
@@ -24,19 +27,19 @@ def train_wedding(
 
     print(f"Starting training on {str(env.metadata['name'])}.")
 
+    num_cpu = 4
     env = ss.pettingzoo_env_to_vec_env_v1(env)
-    env = ss.concat_vec_envs_v1(env, 60, num_cpus=20, base_class="stable_baselines3")
+    env = ss.concat_vec_envs_v1(env, num_cpu, num_cpus=num_cpu, base_class="stable_baselines3")
 
     ep_len = 2048 * 8
     sess_path = Path(f'session_{str(uuid.uuid4())[:8]}')
-    num_cpu = 24
     
-    checkpoint_callback = CheckpointCallback(save_freq=ep_len, save_path=sess_path, name_prefix='wedding')
+    checkpoint_callback = CheckpointCallback(save_freq=max(ep_len//num_cpu, 1), save_path=sess_path, name_prefix='wedding')
 
-    learn_steps = 40
+    learn_steps = 10
     file_name = '' 
 
-    if exists(file_name + '.zip'):
+    if os.path.exists(file_name + '.zip'):
         print('\nloading checkpoint')
         model = PPO.load(file_name, env=env)
         model.n_steps = ep_len
@@ -46,10 +49,10 @@ def train_wedding(
             env,
             verbose=3,
             learning_rate=1e-3,
-            batch_size=2048,
+            batch_size=512,
         )
     for i in range(learn_steps):
-        model.learn(total_timesteps=steps*num_cpu, callback=checkpoint_callback)
+        model.learn(total_timesteps=steps*num_cpu*900, callback=checkpoint_callback)
 
     # print("Model has been saved.")
 
@@ -106,9 +109,8 @@ if __name__ == "__main__":
     env_fn = wedding_gossip_environment_v2
     env_kwargs = {}
 
-    # learn_steps = 5
     # Train a model (takes ~3 minutes on GPU)
     train_wedding(env_fn, steps=2048*8, seed=0, **env_kwargs)
 
     # Watch 2 games
-    eval(env_fn, num_games=1, render_mode="human", **env_kwargs)
+    # eval(env_fn, num_games=1, render_mode="human", **env_kwargs)
