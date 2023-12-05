@@ -1,0 +1,44 @@
+RLEnvironment/wedding_gossip_environment_v2_20231204-120332.zip Team-5Average Team Scores
+Team 5: 1852.58
+
+RLEnvironment/wedding_gossip_environment_v2_20231204-120332.zip All teamsAverage Team Scores
+Team 6: 2982.6
+Team 4: 2434.73
+Team 3: 2080.27
+Team 5: 1834.47
+Team 2: 252.87
+Team 1: 123.2
+RLEnvironment/wedding_gossip_environment_v1_20231203-004337.zip Team-5
+ERROR!
+RLEnvironment/wedding_gossip_environment_v1_20231203-004337.zip All teams
+ERROR!
+RLEnvironment/wedding_gossip_environment_v2_20231203-185406.zip Team-5Average Team Scores
+Team 5: 1978.04
+
+RLEnvironment/wedding_gossip_environment_v2_20231203-185406.zip All teamsAverage Team Scores
+Team 6: 2858.27
+Team 5: 2550.13
+Team 4: 2218.67
+Team 3: 1675.27
+Team 1: 167.2
+Team 2: 159.87
+RLEnvironment/wedding_gossip_environment_v2_20231204-131327.zip Team-5Average Team Scores
+Team 5: 1899.62
+
+RLEnvironment/wedding_gossip_environment_v2_20231204-131327.zip All teamsAverage Team Scores
+Team 6: 2676.4
+Team 4: 2545.4
+Team 3: 2445.73
+Team 5: 2048.87
+Team 2: 139.93
+Team 1: 123.2
+RLEnvironment/wedding_gossip_environment_v2_20231204-101226.zip Team-5Average Team Scores
+Team 5: 2098.32
+
+RLEnvironment/wedding_gossip_environment_v2_20231204-101226.zip All teamsAverage Team Scores
+Team 6: 2819.6
+Team 4: 2493.4
+Team 5: 1979.8
+Team 3: 1862.6
+Team 2: 225.47
+Team 1: 167.2

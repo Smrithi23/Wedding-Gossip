@@ -29,11 +29,11 @@ def run_across_files(_files_list):
                 data = f.read()
                 results = data.split('\n')[5:8]
             print('results: ', results)
-            with open('logs/all_results.txt', 'a') as f:
-                f.write(_file + '\n'.join(results) + '\n')
+            with open('all_results.txt', 'a') as f:
+                f.write(_file + ' Team-5\n' + '\n'.join(results) + '\n')
         except:
-            with open('logs/all_results.txt', 'a') as f:
-                f.write(_file + '\nERROR!\n')
+            with open('all_results.txt', 'a') as f:
+                f.write(_file + ' Team-5' + '\nERROR!\n')
 
         print('Running evaluation for all teams')
         
@@ -46,11 +46,11 @@ def run_across_files(_files_list):
                 data = f.read()
                 results = data.split('\n')[5:12]
             print('results: ', results)
-            with open('logs/all_results.txt', 'a') as f:
-                f.write(_file + '\n'.join(results) + '\n')
+            with open('all_results.txt', 'a') as f:
+                f.write(_file + ' All teams\n' + '\n'.join(results) + '\n')
         except:
-            with open('logs/all_results.txt', 'a') as f:
-                f.write(_file + '\nERROR!\n')
+            with open('all_results.txt', 'a') as f:
+                f.write(_file + ' All teams' + '\nERROR!\n')
 
 if __name__ == '__main__':
     files_list = glob.glob('RLEnvironment/*.zip')
