@@ -16,8 +16,6 @@ class Player():
         self.player_positions = []
         self.player_actions = []
         self.turns = turns
-        self.num_shakes_by_gossip = [0] * 91
-        self.last_gossip_told = 0
 
 
     def observe_before_turn(self, player_positions):
@@ -31,22 +29,16 @@ class Player():
     def _get_command(self):
         '''Returns 'talk', 'listen', or 'move'.'''
         # TODO: Change default behavior seen below to specifications in Brainstorming doc (Stephen)
-        if random.random() < 0.10:
+        if random.random() < 0.12:
             return 'move'
         
         talk_or_listen_prob = random.random()
         highest_gossip_prob = max(self.gossip_list) / 90 
 
-        if self.turn_num < 5: 
-            if talk_or_listen_prob <= highest_gossip_prob:
-                return 'talk'
-            else:
-                return 'listen'
+        if talk_or_listen_prob <= 0.5:
+            return 'talk'
         else:
-            if talk_or_listen_prob <= 0.5: 
-                return 'talk'
-            else:
-                return 'listen'
+            return 'listen'
     
     def _get_direction(self, command):
         '''Returns 'left' or 'right' for the given command (which must be 'talk' or 'listen').'''
@@ -63,15 +55,10 @@ class Player():
     
     def _get_gossip(self):
         '''Returns the gossip number we want to say.'''
-        # desired_gossip = 90 - 89 / self.turns * self.turn_num  # linear decay  1700
-        # desired_gossip = 90 ** (1 - self.turn_num / self.turns)  # exponential decay  800
-        # desired_gossip = 91 - 90 ** (self.turn_num / self.turns)  # inverse exponential decay  1700
-        # return min(self.gossip_list, key=lambda gossip: abs(gossip - desired_gossip))  # closest to decay trend
-        # return random.choices(self.gossip_list, weights=[1 / (abs(gossip - desired_gossip) + 1) + 1 for gossip in self.gossip_list], k=1)[0]  # random near decay trend  2399 3527
-        # return random.choices(self.gossip_list, weights=[max(self.num_shakes_by_gossip) - self.num_shakes_by_gossip[gossip] + 0.01 for gossip in self.gossip_list], k=1)[0]  # reduce prob for shaken gossip
-        # return max(self.gossip_list)  # choose max  300
-        # return self.unique_gossip  # choose initial  2100
-        return random.choice(self.gossip_list)  # choose random  2374  4038
+        # desired_gossip = 90
+        # desired_gossip = 90 - 89 / self.turns * self.turn_num
+        desired_gossip = 89 / math.log(self.turns + 1) * math.log(self.turns - self.turn_num + 1) + 1
+        return min(self.gossip_list, key=lambda gossip: abs(gossip - desired_gossip))
     
     def _get_seats(self):
         '''Returns an ordered list of empty seats to move to in the form [[table1, seat1], [table2, seat2], ...].'''
@@ -90,36 +77,18 @@ class Player():
         temp1 =[]
         temp2 =[]
         temp3 =[]
-        temp4 =[]
-        temp5 =[]
-        temp6 =[]
         for seat in EmptySeats:
-            neighbors = []
-            #print("seat:", seat)
-            for i in range(-3, 4): # range for 3 neighbors on each side   
-                if [seat[0], (seat[1] + i) % 10] in OccupiedSeats and (seat[1] + i) % 10 in range(0, 10) and i != 0:
-                    neighbors.append([seat[0], (seat[1] + i) % 10])
-            neighbors = sorted(neighbors , key=lambda x: x[1])
-            #print("neighbor:", neighbors)
-            neighborSeats = [item[1] for item in neighbors]
-            if len(neighborSeats) >=5:
-                if len(neighborSeats) == 6:
-                    temp1.append(seat)
-                else:
-                    temp2.append(seat)
-            elif len(neighbors) >= 3:
-                if range(seat[1], max(neighborSeats) + 1) in neighborSeats or range(min(neighborSeats), seat[1] + 1) in neighborSeats:
-                    temp3.append(seat)
-                else:
-                    temp4.append(seat) 
-            elif len(neighbors)  >= 1:
-                if range(seat[1], max(neighborSeats) + 1) in neighborSeats or range(min(neighborSeats), seat[1] + 1) in neighborSeats:
-                    temp5.append(seat)
-                else:
-                    temp6.append(seat)
-        #print("Done")
-
-        priority_EmptySeats = temp1 + temp2 + temp3 + temp4 + temp5 + temp6
+            if [seat[0], seat[1] + 1] not in EmptySeats and [seat[0], seat[1] - 1] not in EmptySeats and (seat[1]+1 in range(1, 10) or seat[1]-1 in range(1, 10)):
+                #If the seat has neighbors on both sides
+                temp1.append(seat)
+            elif ( [seat[0], seat[1] + 1] not in EmptySeats or [seat[0], seat[1] - 1] not in EmptySeats ) and (seat[1]+1 in range(1, 10) or seat[1]-1 in range(1, 10)):
+                #If the seat has neighbors on one side
+                temp2.append(seat) 
+            else:
+                #If the seat has no neighbors
+                temp3.append(seat)
+        
+        priority_EmptySeats = temp1 + temp2 + temp3
         #print("Empty Seats: ", EmptySeats)
         #print("Priority EmptySeats: ", priority_EmptySeats)
 
@@ -138,9 +107,7 @@ class Player():
         self.turn_num += 1
         command = self._get_command()
         if command == 'talk':
-            gossip = self._get_gossip()
-            self.last_gossip_told = gossip
-            return command, self._get_direction(command), gossip
+            return command, self._get_direction(command), self._get_gossip()
         elif command == 'listen':
             return command, self._get_direction(command)
         elif command == 'move':
@@ -148,47 +115,10 @@ class Player():
     
     def feedback(self, feedback):
         '''Respond to feedback from a person we talked to.'''
-        
-        list = [[item[0], item[1], item[2]] for item in self.player_positions if item[1] == self.table_num]
-        OccupiedSeatsAtTable = [[item[1], item[2]] for item in list]
-        selfActionAtTable = []
-        for item in self.player_actions:
-            if item[0] == self.id:
-                selfActionAtTable = [item[0], item[1][0], item[1][1]] 
-
-        selfPosition = [self.table_num, self.seat_num]
-        CurrentNeighbors = []
-        CurrentNeighbors2 = []
-
-
-        for i in range(-3, 4):
-            if [selfPosition[0], (selfPosition[1] + i) % 10] in OccupiedSeatsAtTable and (selfPosition[1] + i) % 10 in range(0, 10) and i != 0:
-                CurrentNeighbors.append([selfPosition[0], (selfPosition[1] + i) % 10])
-        
-        for cell in list:
-            sub_cell = cell[1:]
-            if sub_cell in CurrentNeighbors:
-                CurrentNeighbors2.append(cell)
-    
-        if feedback and feedback[0].startswith('Shake Head'):
-            if selfActionAtTable and selfActionAtTable[2] == "left":
-                # print("Left Player Shook Head, should turn right")
-                return 'right'
-            else:
-                # print("Right Player Shook Head, should turn left")
-                return 'left'
-        # print("feedback: ", feedback)
-        # print("selfPosition: ", selfPosition)
-        # print("OccupiedSeatsAtTable: ", OccupiedSeatsAtTable)
-        # print("CurrentNeighbors2: ", CurrentNeighbors2)
-        # print("CurrentActionaAtTable: ", selfActionAtTable)
-        # print("Done")
-
-        for message in feedback:
-            if message[0] == 'S':
-                self.num_shakes_by_gossip[self.last_gossip_told] += 1
+        pass
 
     def get_gossip(self, gossip_item, gossip_talker):
         '''Respond to gossip told to us.'''
+        pass
         if gossip_item not in self.gossip_list:
             self.gossip_list.append(gossip_item)

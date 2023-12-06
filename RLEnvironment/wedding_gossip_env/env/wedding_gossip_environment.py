@@ -20,13 +20,13 @@ MOVE = 4
 NONE = 4
 
 # Reward Params
-ALPHA = .2
+ALPHA = 1
 BETA = 1
-GAMMA = 2
-DELTA = 1
+GAMMA = 10
+DELTA = 2
 
 # Truncation condition
-N_TURNS = 1000
+N_TURNS = 2048
 
 class WeddingGossipEnvironment(ParallelEnv):
     metadata = {"render_modes": ["human"], 
@@ -51,7 +51,7 @@ class WeddingGossipEnvironment(ParallelEnv):
             zip(
                 self.agents,
                 [
-                    MultiDiscrete(np.array([100, 90] + [91 for _ in range(100)] + [4, 4]))
+                    MultiDiscrete(np.array([100, 90] + [91 for _ in range(100)] + [4, 4, 2049]))
                 ]
                 * 90,
             )
@@ -99,7 +99,7 @@ class WeddingGossipEnvironment(ParallelEnv):
         observations = {}
         gossip = random.sample(range(90), 90)
         for i, a in enumerate(self.agents):
-            obs = np.array([self.pos[i], gossip[i]] + self.seating + [0, 0])
+            obs = np.array([self.pos[i], gossip[i]] + self.seating + [0, 0, 0])
             observations[a] = obs
             self.agent_gossips[self.agent_name_mapping[a]].append(gossip[i])
 
@@ -172,6 +172,7 @@ class WeddingGossipEnvironment(ParallelEnv):
                     while i < len(self.agent_gossips[aid]) and self.agent_gossips[aid][i] > heard_gossip:
                         i += 1
                     self.agent_gossips[aid].insert(i, heard_gossip)
+                    self.curr_gossips[aid] = 0
                 for g, i in possible_gossips:
                     feedback[i].append((g == heard_gossip))
                 rewards[agent] += (heard_gossip + 1) * ALPHA
@@ -206,8 +207,7 @@ class WeddingGossipEnvironment(ParallelEnv):
             # gossips = [(1 if g in self.agent_gossips[aid] else 0) for g in range(90)]
             # tbl = aid // 10
             # tbl_actions = [(obs_actions[self.agent_name_mapping[n]] if self.pos[self.agent_name_mapping[n]] // 10 == tbl else 4) for n in self.agents]
-            print(feedback[aid])
-            observations[a] = np.array([self.pos[aid], goss] + self.seating + [feedback[aid].count(True), feedback[aid].count(False)])
+            observations[a] = np.array([self.pos[aid], goss] + self.seating + [feedback[aid].count(True), feedback[aid].count(False), self.timestep])
 
         # Check termination conditions
         terminations = {agent: False for agent in self.agents}

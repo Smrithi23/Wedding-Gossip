@@ -17,7 +17,7 @@ class Player():
         self.gossip_list = [unique_gossip]
         self.group_score = 0
         self.individual_score = 0
-        self.total_rounds = turns 
+        
         #dictionary template -> dict3 = {'gossip_shared': '15,16,77', 'gossip_score': 55}
         #dictionary_temp = {'gossip_shared': [], 'gossip_score': unique_gossip}
         #list of dictionaries 
@@ -133,17 +133,17 @@ class Player():
             #print('talking with a value of ' + str(val))
             #print("talker gossip len" + str(len(self.gossip_list)))
             if self.round_number%2 == 0: #is even, so do this 
-                return 'talk','right',val
+                return 'talk','left',val
 
             else: 
-                return 'talk','left',val
+                return 'talk','right',val
         if action == 'listen':
             #print('listening')
             #print("this is the length of this players gossip" + str(len(self.gossip_list)))
             if self.round_number%2 == 0:
-                return 'listen', 'left'
-            else: 
                 return 'listen', 'right'
+            else: 
+                return 'listen', 'left'
             
         else: #move 
             table1 = random.randint(0, 9)
@@ -221,7 +221,7 @@ class Player():
         #dunction balance between heuristic and round number 
         #if gossip_heuristic is higher 
         round_num = self.round_number
-        thresh_value = 45 
+        thresh_value = 60 
         #right now linear - but may make more logarithmic or exponential 
         #say 100 rounds and there are 
         heuristic = gossip_heuristic
@@ -229,21 +229,17 @@ class Player():
         #to allow for range of 27 cuz acerage of top has a max of about 88
         #once we get a round number 
         #increment = 27/numrounds 
-        increment = float(float(7.25)/self.total_rounds)
-        #increment = .15 
-        #print("the value of the increment is " + str(increment))
-        thresh = thresh_value + increment*round_num
-        #print("this is the value:" + str(heuristic))
-        #print("this is the thresh value:" + str(thresh))'''
+        thresh = thresh_value + .33*round_num
+        '''print("this is the value:" + str(heuristic))
+        print("this is the thresh value:" + str(thresh))'''
         if heuristic > thresh:
             #pick a value 
             #take top 1/3 of scores stored 
             sorted_gossip = self.gossip_list
             sorted_gossip.sort(reverse=True)
-            top_vals = math.floor(len(sorted_gossip)/5)  #maybe as game goes on we adjust this?
+            top_vals = math.floor(len(sorted_gossip)/5)
             random_index = random.randint(0, top_vals)
             gossip_return = sorted_gossip[random_index]
-            #print("the gossip value player number " + str(self.id) + " is sharing is:" + str(gossip_return))
             return 'talk', gossip_return
         #otherwise generate a ratio of listen to move
         #ideally a split of about 20 speakers, 60 listerns, and 10 movers 
@@ -253,7 +249,5 @@ class Player():
         if decision <= 10:
             return 'move',0'''
         return 'listen',0
-
-        
 
 

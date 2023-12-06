@@ -18,8 +18,8 @@ from pettingzoo.utils import parallel_to_aec
 
 from RLEnvironment.wedding_gossip_env import wedding_gossip_environment_v1
 
-CHECKPOINT_PATH="RLEnvironment/"
-ENV_NAME="wedding_gossip_environment_v2"
+CHECKPOINT_PATH="RLEnvironment/session_19e04d79/"
+ENV_NAME="wedding_"
 
 class Player():
     def __init__(self, id, team_num, table_num, seat_num, unique_gossip, color, turns):
@@ -85,7 +85,7 @@ class Player():
 
         try:
             latest_policy = max(
-                glob.glob(f"{CHECKPOINT_PATH}{ENV_NAME}*.zip"), key=os.path.getctime
+                glob.glob("RLEnvironment/wedding_gossip_environment_v2_20231203-185406.zip"), key=os.path.getctime
             )
         except ValueError:
             print("Policy not found.")
@@ -138,10 +138,11 @@ class Player():
         observation = np.array(
                 [self.seat_id, curr_goss] +
                 self.seats + 
-                self.feedbacks
+                self.feedbacks +
+                [self.time_stamp]
         )
         action, switch, pref = self.model.predict(observation)[0]
-        print(f"Player {self.id}: current gossip {curr_goss}, action space {action, switch, pref}")
+        # print(f"Player {self.id}: current gossip {curr_goss}, action space {action, switch, pref}")
 
         if switch and self.gossip_i < len(self.gossip_list) - 1:
             self.gossip_i += 1
