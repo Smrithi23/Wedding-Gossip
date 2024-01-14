@@ -3,7 +3,6 @@ from wedding_gossip import WeddingGossip
 import pandas as pd
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--teams", "-teams", default=[1,2], nargs="+", help="Helper Text")
     parser.add_argument("--seed", "-s", default=2, help="Seed")
@@ -14,11 +13,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # configuration 2
+    df = pd.DataFrame(columns=["Run", "Seed", "Turns", "Team Number", "Team Score", "Group Score"])
+    df.to_csv("config_2.csv")
     run = 1
-
     seeds = [1, 2, 3]
-    turns = [1440]
-    groups = [[2, 3, 4, 5, 6], [1, 3, 4, 5, 6], [1, 2, 4, 5, 6], [1, 2, 3, 5, 6], [1, 2, 3, 4, 5]]
+    turns = [10, 30, 60, 120, 180, 360, 1024, 1440]
+    groups = [[2, 3, 4, 5, 6], [1, 3, 4, 5, 6], [1, 2, 4, 5, 6], [1, 2, 3, 5, 6], [1, 2, 3, 4, 6], [1, 2, 3, 4, 5]]
     for seed in seeds:
         for turn in turns:
             for group in groups:
